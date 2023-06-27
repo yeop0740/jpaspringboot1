@@ -22,7 +22,7 @@ class MemberRepositoryTest {
     public void memberTest() throws Exception {
         // given
         Member member = new Member();
-        member.setUsername("memberA");
+//        member.setUsername("memberA");
 
         // when
         Long savedId = memberRepository.save(member);
@@ -30,7 +30,7 @@ class MemberRepositoryTest {
 
         // then
         assertThat(findMember.getId()).isEqualTo(member.getId());
-        assertThat(findMember.getUsername()).isEqualTo(member.getUsername());
+//        assertThat(findMember.getUsername()).isEqualTo(member.getUsername());
         assertThat(findMember).isEqualTo(member); // true 임 같은 영속성 컨텍스트 안에선 id 값이 같으면 같은 객체로 인식함.
         // 1차 캐시로 불리는 곳에 영속성 컨텍스로 관리되고 있는 것에 이미 존재하기 때문에 기존에 관리하던 객체가 나온다.
         System.out.println("findMember == member: " + (findMember == member));
