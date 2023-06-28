@@ -7,7 +7,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create # application 실행시점에 내가 가진 데이터 다 지우고 다시 create
+      ddl-auto: create-drop
     properties:
       hibernate:
 #        show_sql: true
