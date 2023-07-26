@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -78,6 +79,22 @@ public class MemberApiController {
 
     }
 
+    /**
+     * 조회 V2: 응답 값으로 엔티티가 아닌 별도의 DTO 를 반환한다.
+     */
+    @GetMapping("/api/v2/members")
+    public Result membersV2() {
+
+        List<Member> findMembers = memberService.findMembers();
+        // Entity -> DTO
+        List<MemberDTO> collect = findMembers.stream()
+                .map(m -> new MemberDTO(m.getName()))
+                .toList();
+
+        return new Result(collect);
+
+    }
+
     @Data
     static class CreateMemberResponse {
 
@@ -111,6 +128,22 @@ public class MemberApiController {
     static class UpdateMemberResponse {
 
         private Long id;
+
+        private String name;
+
+    }
+
+    @Data
+    @AllArgsConstructor
+    static class Result<T> {
+
+        private T data;
+
+    }
+
+    @Data
+    @AllArgsConstructor
+    static class MemberDTO {
 
         private String name;
 
