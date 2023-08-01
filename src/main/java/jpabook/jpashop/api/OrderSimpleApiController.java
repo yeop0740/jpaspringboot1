@@ -41,6 +41,10 @@ public class OrderSimpleApiController {
         return all;
     }
 
+    /**
+     * V2. 엔티티를 조회해서 DTO 로 변환(fetch join X)
+     * - 단점 : 지연로딩으로 쿼리 N 번 호출
+     */
     @GetMapping("/api/v2/simple-orders")
     public List<SimpleOrderDto> ordersV2() {
         List<Order> orders = orderRepository.findAllByString(new OrderSearch());
