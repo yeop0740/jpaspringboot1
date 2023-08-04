@@ -7,6 +7,8 @@ import jpabook.jpashop.domain.OrderStatus;
 import jpabook.jpashop.repository.OrderSearch;
 import jpabook.jpashop.repository.order.OrderQueryRepository;
 import jpabook.jpashop.repository.order.OrderRepository;
+import jpabook.jpashop.repository.order.query.OrderFlatDto;
+import jpabook.jpashop.repository.order.query.OrderItemQueryDto;
 import jpabook.jpashop.repository.order.query.OrderQueryDto;
 import jpabook.jpashop.service.OrderService;
 import lombok.Data;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * V1. 엔티티 직접 노출
@@ -35,6 +38,9 @@ import java.util.List;
  *
  * V5. JPA 에서 DTO 로 바로 조회, 컬렉션 1 조회 최적화 버전 (1 + 1 Query)
  * - 페이징 가능
+ *
+ * V6. JPA 에서 DTO 로 바로 조회, 플랫 데이터(1 Query) (1 Query)
+ * - 페이징 불가능
  */
 @RestController
 @RequiredArgsConstructor
@@ -102,6 +108,17 @@ public class OrderApiController {
     @GetMapping("/api/v5/orders")
     public List<OrderQueryDto> ordersV5() {
         return orderQueryRepository.findAllByDto_optimization();
+    }
+
+    @GetMapping("/api/v6/orders")
+    public List<OrderQueryDto> ordersV6() {
+        List<OrderFlatDto> flats = orderQueryRepository.findAllByDto_flat();
+        return flats.stream()
+                .collect(Collectors.groupingBy(o -> new OrderQueryDto(o.getOrderId(), o.getName(), o.getOrderDate(), o.getOrderStatus(), o.getAddress()),
+                        Collectors.mapping(o -> new OrderItemQueryDto(o.getOrderId(), o.getItemName(), o.getOrderPrice(), o.getCount()), Collectors.toList())
+                )).entrySet().stream()
+                .map(e -> new OrderQueryDto(e.getKey().getOrderId(), e.getKey().getName(), e.getKey().getOrderDate(), e.getKey().getOrderStatus(), e.getKey().getAddress(), e.getValue()))
+                .collect(Collectors.toList());
     }
 
     @Data

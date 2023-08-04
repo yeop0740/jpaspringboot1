@@ -1,6 +1,7 @@
 package jpabook.jpashop.repository.order;
 
 import jakarta.persistence.EntityManager;
+import jpabook.jpashop.repository.order.query.OrderFlatDto;
 import jpabook.jpashop.repository.order.query.OrderItemQueryDto;
 import jpabook.jpashop.repository.order.query.OrderQueryDto;
 import lombok.RequiredArgsConstructor;
@@ -98,5 +99,16 @@ public class OrderQueryRepository {
 
         return orderItems.stream()
                 .collect(Collectors.groupingBy(OrderItemQueryDto::getOrderId));
+    }
+
+    public List<OrderFlatDto> findAllByDto_flat() {
+        return em.createQuery(
+                "select new jpabook.jpashop.repository.order.query.OrderFlatDto(o.id, m.name, o.orderDate, d.address, o.status, i.name, oi.orderPrice, oi.count)" +
+                        " from Order o" +
+                        " join o.member m" +
+                        " join o.delivery d" +
+                        " join o.orderItems oi" +
+                        " join oi.item i", OrderFlatDto.class)
+                .getResultList();
     }
 }
