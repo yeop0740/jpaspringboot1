@@ -23,6 +23,9 @@ import java.util.List;
  *
  * V2. 엔티티를 조회해서 DTO 로 변환(fetch join X)
  * - 트랜잭션 안에서 지연 로딩 필요
+ *
+ * V3. 엔티티를 조회해서 DTO 로 변환(fetch join O)
+ * - 페이징 시에는 N 부분ㅇ르 포기해야함(대신에 batch fetch size 옵션 주면 N -> 1 쿼리로 변경 가능)
  */
 @RestController
 @RequiredArgsConstructor
@@ -51,7 +54,17 @@ public class OrderApiController {
     public List<OrderDto> orderV2() {
         List<Order> orders = orderRepository.findAllByString(new OrderSearch());
 
-        return orders.stream().map(OrderDto::new).toList();
+        return orders.stream()
+                .map(OrderDto::new)
+                .toList();
+    }
+
+    @GetMapping("/api/v3/orders")
+    public List<OrderDto> orderV3() {
+        List<Order> orders = orderRepository.findAllWithItem();
+        return orders.stream()
+                .map(OrderDto::new)
+                .toList();
     }
 
     @Data
